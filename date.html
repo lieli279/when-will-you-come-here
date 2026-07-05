@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Pick a Date & Time</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+        :root{--bg1:#fff0f2;--card:#ffffff;--accent:#e74c3c;--muted:#7f8c8d}
+        *{box-sizing:border-box}
+        body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(180deg,#ffdfe4 0%, #fff0f2 100%);font-family:Inter,system-ui,Arial;color:#222}
+        .card{width:100%;max-width:640px;background:var(--card);border-radius:14px;padding:28px 28px;box-shadow:0 18px 40px rgba(0,0,0,.08);}
+        h1{font-family:Playfair Display,serif;margin:0 0 6px 0;color:var(--accent);font-size:1.8rem}
+        p{margin:0 0 18px 0;color:#333}
+        .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        label{display:block;font-size:0.9rem;margin-bottom:6px;color:var(--muted)}
+        input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid #eee;font-size:1rem}
+        .full{grid-column:1/-1}
+        .actions{display:flex;gap:12px;justify-content:flex-end;margin-top:18px}
+        .btn{padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+        .primary{background:#27ae60;color:white}
+        .ghost{background:transparent;border:1px solid #ddd}
+        .result{margin-top:14px;padding:12px;border-radius:10px;background:#fff8f9;color:#b03a3a}
+        @media(max-width:560px){.grid{grid-template-columns:1fr}.actions{justify-content:center}}
+    </style>
+</head>
+<body>
+    <main class="card" role="main">
+        <h1>When will you come?</h1>
+        <p>Please pick the date, time and year you'd like to come. I'm so excited ❤️</p>
+
+        <form id="visitForm">
+            <div class="grid">
+                <div>
+                    <label for="date">Date</label>
+                    <input type="date" id="date" name="date">
+                </div>
+                <div>
+                    <label for="time">Time</label>
+                    <input type="time" id="time" name="time">
+                </div>
+                <div class="full">
+                    <label for="year">Year (if you prefer to set it manually)</label>
+                    <input type="number" id="year" name="year" min="1900" max="3000" placeholder="e.g. 2026">
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="btn ghost" id="backBtn">Back</button>
+                <button type="submit" class="btn primary">Save</button>
+            </div>
+        </form>
+
+        <div id="out" aria-live="polite"></div>
+    </main>
+
+    <script>
+        const form = document.getElementById('visitForm');
+        const out = document.getElementById('out');
+        const back = document.getElementById('backBtn');
+
+        back.addEventListener('click', ()=>{ window.location.href = 'index.html'; });
+
+        form.addEventListener('submit', (e)=>{
+            e.preventDefault();
+            const d = document.getElementById('date').value;
+            const t = document.getElementById('time').value;
+            const y = document.getElementById('year').value;
+            // if user didn't pick year separately but date has year, keep that
+            let chosen = '';
+            if(d){
+                const dt = new Date(d);
+                const dateStr = dt.toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'});
+                chosen += dateStr;
+            }
+            if(y && !d){
+                chosen += y;
+            } else if(y && d){
+                // replace year in date
+                try{
+                    const dt = new Date(d);
+                    dt.setFullYear(parseInt(y,10));
+                    chosen = dt.toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'});
+                }catch(_){/* ignore */}
+            }
+            if(t) chosen += (chosen? ' at ' : '') + t;
+
+            if(!chosen) {
+                out.innerHTML = '<div class="result">Please choose at least a date or a year/time.</div>';
+                return;
+            }
+
+            out.innerHTML = `<div class="result">Thank you! You picked: <strong>${chosen}</strong></div>`;
+            // small confetti
+            for(let i=0;i<60;i++){
+                setTimeout(()=>{
+                    const el = document.createElement('div');
+                    el.textContent = ['🎉','💖','✨'][Math.floor(Math.random()*3)];
+                    el.style.position='fixed';
+                    el.style.left = Math.random()*100 + 'vw';
+                    el.style.top = '-20px';
+                    el.style.fontSize = (10+Math.random()*18)+'px';
+                    document.body.appendChild(el);
+                    let y= -20;
+                    const id = setInterval(()=>{ y += 8; el.style.top = y + 'px'; if(y>window.innerHeight+40){clearInterval(id);el.remove();}},24);
+                }, i*12);
+            }
+        });
+    </script>
+</body>
+</html>
