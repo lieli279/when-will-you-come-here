@@ -40,7 +40,7 @@
                     <input type="time" id="time" name="time">
                 </div>
                 <div class="full">
-                    <label for="year">Year (if you prefer to set it manually)</label>
+                    <label for="year">Year (optional)</label>
                     <input type="number" id="year" name="year" min="1900" max="3000" placeholder="e.g. 2026">
                 </div>
             </div>
@@ -66,45 +66,14 @@
             const d = document.getElementById('date').value;
             const t = document.getElementById('time').value;
             const y = document.getElementById('year').value;
-            // if user didn't pick year separately but date has year, keep that
-            let chosen = '';
-            if(d){
-                const dt = new Date(d);
-                const dateStr = dt.toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'});
-                chosen += dateStr;
-            }
-            if(y && !d){
-                chosen += y;
-            } else if(y && d){
-                // replace year in date
-                try{
-                    const dt = new Date(d);
-                    dt.setFullYear(parseInt(y,10));
-                    chosen = dt.toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'});
-                }catch(_){/* ignore */}
-            }
-            if(t) chosen += (chosen? ' at ' : '') + t;
 
-            if(!chosen) {
-                out.innerHTML = '<div class="result">Please choose at least a date or a year/time.</div>';
-                return;
-            }
+            if(!d && !y && !t){ out.innerHTML = '<div class="result">Please choose at least a date or a year/time.</div>'; return; }
 
-            out.innerHTML = `<div class="result">Thank you! You picked: <strong>${chosen}</strong></div>`;
-            // small confetti
-            for(let i=0;i<60;i++){
-                setTimeout(()=>{
-                    const el = document.createElement('div');
-                    el.textContent = ['🎉','💖','✨'][Math.floor(Math.random()*3)];
-                    el.style.position='fixed';
-                    el.style.left = Math.random()*100 + 'vw';
-                    el.style.top = '-20px';
-                    el.style.fontSize = (10+Math.random()*18)+'px';
-                    document.body.appendChild(el);
-                    let y= -20;
-                    const id = setInterval(()=>{ y += 8; el.style.top = y + 'px'; if(y>window.innerHeight+40){clearInterval(id);el.remove();}},24);
-                }, i*12);
-            }
+            const payload = { date: d || null, time: t || null, year: y || null, savedAt: new Date().toISOString() };
+            try{ localStorage.setItem('visit', JSON.stringify(payload)); }catch(err){ console.warn('storage failed',err); }
+
+            // Navigate to summary for confirmation
+            window.location.href = 'summary.html';
         });
     </script>
 </body>

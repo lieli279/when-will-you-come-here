@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Your Planned Visit</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+        :root{--bg:#fff6f8;--card:#fff;--accent:#e74c3c;--muted:#7f8c8d}
+        *{box-sizing:border-box}
+        body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(180deg,#ffe7ec 0%, #fff6f8 100%);font-family:Inter,system-ui,Arial;color:#222}
+        .card{width:100%;max-width:640px;background:var(--card);border-radius:14px;padding:28px;box-shadow:0 18px 40px rgba(0,0,0,.08);text-align:center}
+        h1{font-family:Playfair Display,serif;margin:0 0 6px 0;color:var(--accent);font-size:1.8rem}
+        p{margin:0 0 18px 0;color:#333}
+        .picked{margin-top:12px;padding:18px;border-radius:12px;background:#fff8f9;color:#b03a3a;font-weight:600}
+        .actions{display:flex;gap:12px;justify-content:center;margin-top:18px}
+        .btn{padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+        .primary{background:#27ae60;color:white}
+        .ghost{background:transparent;border:1px solid #ddd}
+    </style>
+</head>
+<body>
+    <main class="card" role="main">
+        <h1>All set! 🎉</h1>
+        <p>Here's what you picked — I'll be counting the days ❤️</p>
+
+        <div id="picked" class="picked">Loading…</div>
+
+        <div class="actions">
+            <button id="edit" class="btn ghost">Edit</button>
+            <button id="done" class="btn primary">Done</button>
+        </div>
+    </main>
+
+    <script>
+        const picked = document.getElementById('picked');
+        const edit = document.getElementById('edit');
+        const done = document.getElementById('done');
+
+        function render(){
+            const raw = localStorage.getItem('visit');
+            if(!raw){ picked.textContent = 'No visit saved yet.'; return; }
+            try{
+                const v = JSON.parse(raw);
+                let text = '';
+                if(v.date){
+                    const dt = new Date(v.date);
+                    if(v.year){ dt.setFullYear(parseInt(v.year,10)); }
+                    text += dt.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+                } else if(v.year){ text += v.year; }
+                if(v.time) text += (text? ' at ' : '') + v.time;
+                if(!text) text = 'No specific date/time chosen.';
+                picked.textContent = text;
+
+                // small celebratory confetti
+                for(let i=0;i<40;i++){
+                    setTimeout(()=>{
+                        const el = document.createElement('div');
+                        el.textContent = ['🎉','💖','✨'][Math.floor(Math.random()*3)];
+                        el.style.position='fixed';
+                        el.style.left = Math.random()*100 + 'vw';
+                        el.style.top = '-20px';
+                        el.style.fontSize = (10+Math.random()*18)+'px';
+                        document.body.appendChild(el);
+                        let y= -20;
+                        const id = setInterval(()=>{ y += 8; el.style.top = y + 'px'; if(y>window.innerHeight+40){clearInterval(id);el.remove();}},24);
+                    }, i*10);
+                }
+            }catch(err){ picked.textContent = 'Could not read saved visit.'; }
+        }
+
+        edit.addEventListener('click', ()=>{ window.location.href = 'date.html'; });
+        done.addEventListener('click', ()=>{ window.location.href = 'index.html'; });
+
+        window.addEventListener('load', render);
+    </script>
+</body>
+</html>
