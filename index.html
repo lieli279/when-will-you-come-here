@@ -12,7 +12,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap');
         *{box-sizing:border-box}
         html,body{height:100%}
-        body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,var(--bg-1) 0%, var(--bg-2) 100%);font-family:Inter,system-ui,Arial;color:#222;overflow:hidden}
+        body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,var(--bg-1) 0%, var(--bg-2) 100%);font-family:Inter,system-ui,Arial;color:#222}
         .stage{width:100%;max-width:820px;padding:24px}
         .card{position:relative;background:var(--card);border-radius:14px;padding:28px;box-shadow:0 22px 48px rgba(0,0,0,.12);text-align:center;backdrop-filter:blur(6px);}
         h1{font-family:Playfair Display,serif;margin:0 0 6px 0;color:var(--accent);font-size:clamp(1.6rem,3.6vw,2.6rem)}
@@ -73,7 +73,7 @@
         }
         setInterval(createHeart, 360);
 
-        // Evasive No button with progressive difficulty
+        // Evasive No button with stronger progressive difficulty
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
         const controls = document.getElementById('controls');
@@ -92,27 +92,37 @@
             return {minX,maxX,minY,maxY,rect};
         }
 
+        // Stronger dodge: faster ramp, bigger push away, proximity-based triggers
         function moveNoButton(hard=false){
             const b = boundsFor(noBtn);
-            // Difficulty scale increases jump range and occasionally teleport off-axis
-            attempts = Math.min(attempts + 1, 12);
-            const difficulty = attempts / 12; // 0..1
-            // Larger jumps with more difficulty
+            // New aggressiveness: fewer attempts to reach max difficulty
+            attempts = Math.min(attempts + 1, 8);
+            const difficulty = attempts / 8; // 0..1
+
             const rangeX = b.maxX - b.minX;
             const rangeY = b.maxY - b.minY;
             let x = Math.random()*rangeX + b.minX;
             let y = Math.random()*rangeY + b.minY;
-            // push away from center more as difficulty increases
+
+            // Push away from center more aggressively as difficulty increases
             const centerX = b.rect.width/2 - noBtn.offsetWidth/2;
             const centerY = b.rect.height/2 - noBtn.offsetHeight/2;
-            x += (x < centerX ? -1 : 1) * difficulty * (rangeX*0.25);
-            y += (y < centerY ? -1 : 1) * difficulty * (rangeY*0.18);
+            x += (x < centerX ? -1 : 1) * difficulty * (rangeX * 0.5);
+            y += (y < centerY ? -1 : 1) * difficulty * (rangeY * 0.4);
 
-            // Occasionally do a quick teleport (makes it harder)
-            if(Math.random() < 0.12 + difficulty*0.36) {
+            // Teleport chance increases with difficulty (cap it)
+            let teleportProb = 0.25 + difficulty * 0.5;
+            teleportProb = Math.min(teleportProb, 0.96);
+
+            const willTeleport = Math.random() < teleportProb || hard;
+
+            if(willTeleport){
+                // Instant jump
                 noBtn.style.transition = 'none';
             } else {
-                noBtn.style.transition = 'left ' + (180 - difficulty*80) + 'ms cubic-bezier(.2,.9,.3,1), top ' + (180 - difficulty*80) + 'ms cubic-bezier(.2,.9,.3,1)';
+                // Faster transitions at higher difficulty
+                const duration = Math.max(60, Math.round(160 - difficulty * 110));
+                noBtn.style.transition = `left ${duration}ms cubic-bezier(.2,.9,.3,1), top ${duration}ms cubic-bezier(.2,.9,.3,1)`;
             }
 
             x = Math.max(b.minX, Math.min(x, b.maxX));
@@ -120,6 +130,17 @@
 
             noBtn.style.left = x + 'px';
             noBtn.style.top = y + 'px';
+
+            // Occasionally make a double-move burst to make it unpredictable
+            if(Math.random() < 0.18 + difficulty * 0.45){
+                setTimeout(()=>{
+                    const b2 = boundsFor(noBtn);
+                    const nx = Math.random()*(b2.maxX-b2.minX)+b2.minX;
+                    const ny = Math.random()*(b2.maxY-b2.minY)+b2.minY;
+                    noBtn.style.left = Math.max(b2.minX, Math.min(nx, b2.maxX)) + 'px';
+                    noBtn.style.top = Math.max(b2.minY, Math.min(ny, b2.maxY)) + 'px';
+                }, 90);
+            }
         }
 
         function initNo(){
@@ -129,10 +150,30 @@
             noBtn.style.top = (pr.height/2 - noBtn.offsetHeight/2) + 'px';
         }
 
+        // Proximity-based avoidance: when pointer moves close to the button, it dodges
+        controls.addEventListener('pointermove', (ev)=>{
+            const rect = controls.getBoundingClientRect();
+            const px = ev.clientX - rect.left;
+            const py = ev.clientY - rect.top;
+            const btnRect = noBtn.getBoundingClientRect();
+            const bx = btnRect.left - rect.left + btnRect.width/2;
+            const by = btnRect.top - rect.top + btnRect.height/2;
+            const dx = px - bx;
+            const dy = py - by;
+            const dist = Math.hypot(dx,dy);
+            // threshold grows with difficulty (harder to get close)
+            const threshold = 70 + (attempts/8)*80;
+            if(dist < threshold){
+                moveNoButton();
+            }
+        });
+
         noBtn.addEventListener('pointerdown', (e)=>{
             // prevent focus on pointerdown causing accidental click
             e.preventDefault();
+            // Hard move and burst
             moveNoButton(true);
+            setTimeout(()=>moveNoButton(), 60);
             // playful bounce
             noBtn.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:260});
         });
