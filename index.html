@@ -2,219 +2,201 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>When Will You Come Here?</title>
     <style>
-        :root{
-            --bg-1:#ff9a9e; --bg-2:#fad0c4; --card:#ffffffcc; --accent:#e74c3c; --muted:#7f8c8d;
-            --success-1:#27ae60; --success-2:#2ecc71;
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+            overflow: hidden;
         }
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap');
-        *{box-sizing:border-box}
-        html,body{height:100%}
-        body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,var(--bg-1) 0%, var(--bg-2) 100%);font-family:Inter,system-ui,Arial;color:#222}
-        .stage{width:100%;max-width:820px;padding:24px}
-        .card{position:relative;background:var(--card);border-radius:14px;padding:28px;box-shadow:0 22px 48px rgba(0,0,0,.12);text-align:center;backdrop-filter:blur(6px);}
-        h1{font-family:Playfair Display,serif;margin:0 0 6px 0;color:var(--accent);font-size:clamp(1.6rem,3.6vw,2.6rem)}
-        p.lead{margin:0 0 18px;color:#2c3e50}
-        .controls{position:relative;height:110px;display:flex;align-items:center;justify-content:center}
-        .btn{appearance:none;border:none;padding:12px 22px;font-size:1rem;border-radius:999px;cursor:pointer;font-weight:700;box-shadow:0 10px 24px rgba(0,0,0,.12);transition:transform 220ms,box-shadow 220ms}
-        .btn:active{transform:scale(.98)}
-        .yes{background:linear-gradient(45deg,var(--success-1),var(--success-2));color:#fff;margin-right:18px}
-        .no{position:absolute;background:linear-gradient(45deg,#ff6b6b,#ff4757);color:#fff}
-        .meta{margin-top:18px;color:var(--muted);font-size:0.95rem}
-        .saved{margin-top:14px;padding:12px;border-radius:10px;background:#fff8f9;color:#b03a3a}
-        .actions{display:flex;gap:10px;justify-content:center;margin-top:12px}
-        .link-like{background:transparent;border:1px solid #eee;padding:8px 12px;border-radius:8px}
-        .hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
-        .heart{position:absolute;font-size:20px;animation:rise linear infinite;opacity:.85;transform-origin:center}
-        @keyframes rise{from{transform:translateY(110vh) rotate(0)}to{transform:translateY(-20vh) rotate(360deg)}}
-        @media(max-width:480px){.controls{height:150px}.no{top:18px}}
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            animation: fadeIn 1.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: #e74c3c;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        p.question {
+            font-size: 1.8rem;
+            margin-bottom: 40px;
+            color: #2c3e50;
+            line-height: 1.4;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        button.yes {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        button.no {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            color: #ff6b6b;
+            animation: float 8s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
     </style>
 </head>
 <body>
-    <div class="hearts" id="hearts" aria-hidden="true"></div>
-    <main class="stage">
-        <section class="card" aria-labelledby="title">
-            <h1 id="title">💕 When Will You Come Here?</h1>
-            <p class="lead">I can't wait to see you. Will you come visit me?</p>
-
-            <div class="controls" id="controls">
-                <button class="btn yes" id="yesBtn" aria-label="Yes">Yes, Soon! ❤️</button>
-                <button class="btn no" id="noBtn" aria-label="No">Not Yet 😢</button>
-            </div>
-
-            <div class="meta">Tap the buttons — try catching the No button if you can 😄</div>
-
-            <div id="savedArea" class="saved" style="display:none" aria-live="polite"></div>
-            <div class="actions" id="savedActions" style="display:none">
-                <button class="btn link-like" id="editBtn">Edit visit</button>
-                <button class="btn link-like" id="clearBtn">Clear</button>
-            </div>
-
-            <div style="margin-top:10px;color:var(--muted);font-size:0.9rem">Made with ❤️</div>
-        </section>
-    </main>
+    <div class="hearts" id="hearts"></div>
+    
+    <div class="container">
+        <h1>💕 When Will You Come Here? 💕</h1>
+        <p class="question">I can't wait to see you...</p>
+        
+        <div class="buttons">
+            <button class="yes" onclick="handleYes()">Yes, Soon! ❤️</button>
+            <button class="no" onclick="handleNo()">Not Yet 😢</button>
+        </div>
+        
+        <div class="footer">
+            Made with love for you
+        </div>
+    </div>
 
     <script>
-        // Hearts
-        const heartsRoot = document.getElementById('hearts');
-        function createHeart(){
-            const d = document.createElement('div');
-            d.className = 'heart';
-            d.textContent = ['❤️','💖','💕','💗'][Math.floor(Math.random()*4)];
-            const size = Math.random()*18 + 14;
-            d.style.fontSize = size + 'px';
-            d.style.left = Math.random()*100 + 'vw';
-            d.style.animationDuration = (Math.random()*6 + 6) + 's';
-            d.style.opacity = (Math.random()*0.4 + 0.6).toFixed(2);
-            heartsRoot.appendChild(d);
-            setTimeout(()=>d.remove(), 14000);
-        }
-        setInterval(createHeart, 360);
-
-        // Evasive No button with stronger progressive difficulty
-        const noBtn = document.getElementById('noBtn');
-        const yesBtn = document.getElementById('yesBtn');
-        const controls = document.getElementById('controls');
-
-        // Track attempts in session (reset on page unload) to increase difficulty
-        let attempts = 0;
-
-        function boundsFor(btn){
-            const rect = controls.getBoundingClientRect();
-            const btnRect = btn.getBoundingClientRect();
-            const padding = 8;
-            const minX = padding;
-            const maxX = rect.width - btnRect.width - padding;
-            const minY = padding;
-            const maxY = rect.height - btnRect.height - padding;
-            return {minX,maxX,minY,maxY,rect};
+        // Floating hearts animation
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.textContent = ['❤️', '💖', '💕', '💗'][Math.floor(Math.random() * 4)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 5 + 6) + 's';
+            heart.style.opacity = Math.random() * 0.5 + 0.5;
+            document.getElementById('hearts').appendChild(heart);
+            
+            setTimeout(() => {
+                heart.remove();
+            }, 12000);
         }
 
-        // Stronger dodge: faster ramp, bigger push away, proximity-based triggers
-        function moveNoButton(hard=false){
-            const b = boundsFor(noBtn);
-            // New aggressiveness: fewer attempts to reach max difficulty
-            attempts = Math.min(attempts + 1, 8);
-            const difficulty = attempts / 8; // 0..1
+        setInterval(createHeart, 300);
 
-            const rangeX = b.maxX - b.minX;
-            const rangeY = b.maxY - b.minY;
-            let x = Math.random()*rangeX + b.minX;
-            let y = Math.random()*rangeY + b.minY;
+        function handleYes() {
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <h1>Yay! 🎉</h1>
+                <p style="font-size: 2rem; color: #27ae60;">I'll be there soon! Can't wait to hold you ❤️</p>
+                <button onclick="location.reload()" style="margin-top: 30px; padding: 12px 30px; font-size: 1.1rem;">Back</button>
+            `;
+            confettiEffect();
+        }
 
-            // Push away from center more aggressively as difficulty increases
-            const centerX = b.rect.width/2 - noBtn.offsetWidth/2;
-            const centerY = b.rect.height/2 - noBtn.offsetHeight/2;
-            x += (x < centerX ? -1 : 1) * difficulty * (rangeX * 0.5);
-            y += (y < centerY ? -1 : 1) * difficulty * (rangeY * 0.4);
+        function handleNo() {
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <h1>😔</h1>
+                <p style="font-size: 1.8rem;">Okay... I'll keep waiting for you</p>
+                <button onclick="location.reload()" style="margin-top: 30px; padding: 12px 30px; font-size: 1.1rem;">Try Again</button>
+            `;
+        }
 
-            // Teleport chance increases with difficulty (cap it)
-            let teleportProb = 0.25 + difficulty * 0.5;
-            teleportProb = Math.min(teleportProb, 0.96);
-
-            const willTeleport = Math.random() < teleportProb || hard;
-
-            if(willTeleport){
-                // Instant jump
-                noBtn.style.transition = 'none';
-            } else {
-                // Faster transitions at higher difficulty
-                const duration = Math.max(60, Math.round(160 - difficulty * 110));
-                noBtn.style.transition = `left ${duration}ms cubic-bezier(.2,.9,.3,1), top ${duration}ms cubic-bezier(.2,.9,.3,1)`;
-            }
-
-            x = Math.max(b.minX, Math.min(x, b.maxX));
-            y = Math.max(b.minY, Math.min(y, b.maxY));
-
-            noBtn.style.left = x + 'px';
-            noBtn.style.top = y + 'px';
-
-            // Occasionally make a double-move burst to make it unpredictable
-            if(Math.random() < 0.18 + difficulty * 0.45){
-                setTimeout(()=>{
-                    const b2 = boundsFor(noBtn);
-                    const nx = Math.random()*(b2.maxX-b2.minX)+b2.minX;
-                    const ny = Math.random()*(b2.maxY-b2.minY)+b2.minY;
-                    noBtn.style.left = Math.max(b2.minX, Math.min(nx, b2.maxX)) + 'px';
-                    noBtn.style.top = Math.max(b2.minY, Math.min(ny, b2.maxY)) + 'px';
-                }, 90);
+        function confettiEffect() {
+            // Simple confetti using CSS/JS
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const conf = document.createElement('div');
+                    conf.style.position = 'fixed';
+                    conf.style.left = Math.random() * 100 + 'vw';
+                    conf.style.top = '-10px';
+                    conf.style.fontSize = '20px';
+                    conf.textContent = ['🎉', '✨', '💖'][Math.floor(Math.random()*3)];
+                    conf.style.zIndex = 1000;
+                    document.body.appendChild(conf);
+                    
+                    let y = 0;
+                    const animate = setInterval(() => {
+                        y += 8;
+                        conf.style.top = y + 'px';
+                        conf.style.transform = `rotate(${y * 2}deg)`;
+                        if (y > window.innerHeight) {
+                            clearInterval(animate);
+                            conf.remove();
+                        }
+                    }, 20);
+                }, i * 20);
             }
         }
-
-        function initNo(){
-            noBtn.style.position = 'absolute';
-            const pr = controls.getBoundingClientRect();
-            noBtn.style.left = (pr.width/2 + 40) + 'px';
-            noBtn.style.top = (pr.height/2 - noBtn.offsetHeight/2) + 'px';
-        }
-
-        // Proximity-based avoidance: when pointer moves close to the button, it dodges
-        controls.addEventListener('pointermove', (ev)=>{
-            const rect = controls.getBoundingClientRect();
-            const px = ev.clientX - rect.left;
-            const py = ev.clientY - rect.top;
-            const btnRect = noBtn.getBoundingClientRect();
-            const bx = btnRect.left - rect.left + btnRect.width/2;
-            const by = btnRect.top - rect.top + btnRect.height/2;
-            const dx = px - bx;
-            const dy = py - by;
-            const dist = Math.hypot(dx,dy);
-            // threshold grows with difficulty (harder to get close)
-            const threshold = 70 + (attempts/8)*80;
-            if(dist < threshold){
-                moveNoButton();
-            }
-        });
-
-        noBtn.addEventListener('pointerdown', (e)=>{
-            // prevent focus on pointerdown causing accidental click
-            e.preventDefault();
-            // Hard move and burst
-            moveNoButton(true);
-            setTimeout(()=>moveNoButton(), 60);
-            // playful bounce
-            noBtn.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:260});
-        });
-        noBtn.addEventListener('mouseenter', ()=>{
-            if(window.matchMedia('(hover: hover)').matches){ moveNoButton(); }
-        });
-        noBtn.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); moveNoButton(); } });
-
-        // Yes navigates to date page
-        yesBtn.addEventListener('click', ()=>{ window.location.href = 'date.html'; });
-
-        // Saved visit display and controls
-        const savedArea = document.getElementById('savedArea');
-        const savedActions = document.getElementById('savedActions');
-        const editBtn = document.getElementById('editBtn');
-        const clearBtn = document.getElementById('clearBtn');
-
-        function showSaved(){
-            const raw = localStorage.getItem('visit');
-            if(!raw){ savedArea.style.display='none'; savedActions.style.display='none'; return; }
-            try{
-                const v = JSON.parse(raw);
-                let text = '';
-                if(v.date){
-                    const dt = new Date(v.date);
-                    // if year present in saved object override
-                    if(v.year) dt.setFullYear(parseInt(v.year,10));
-                    text += dt.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
-                } else if(v.year){ text += v.year; }
-                if(v.time) text += (text? ' at ' : '') + v.time;
-                savedArea.textContent = 'Saved visit: ' + text;
-                savedArea.style.display = 'block';
-                savedActions.style.display = 'flex';
-            }catch(err){ localStorage.removeItem('visit'); savedArea.style.display='none'; savedActions.style.display='none'; }
-        }
-
-        editBtn.addEventListener('click', ()=>{ window.location.href = 'date.html'; });
-        clearBtn.addEventListener('click', ()=>{ localStorage.removeItem('visit'); showSaved(); attempts = 0; });
-
-        window.addEventListener('load', ()=>{ initNo(); showSaved(); for(let i=0;i<8;i++) setTimeout(createHeart,i*120); });
-        window.addEventListener('resize', ()=>{ initNo(); });
     </script>
 </body>
 </html>
